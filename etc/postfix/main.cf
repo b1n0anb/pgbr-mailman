@@ -1,0 +1,95 @@
+myhostname = olifante.postgresql.org.br
+mydomain = postgresql.org.br
+
+myorigin = /etc/mailname
+
+inet_interfaces = all
+inet_protocols = all
+
+mydestination = $myhostname, localhost, localhost.localdomain
+
+
+mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+relay_domains =
+        listas.postgresql.org.br
+
+transport_maps = hash:/srv/postgresql.org.br/mail/transport/transport-listas
+mailman_destination_recipient_limit = 1
+
+home_mailbox = Maildir/
+
+smtpd_banner = $myhostname
+
+
+alias_maps = hash:/etc/aliases
+alias_database = hash:/etc/aliases
+mailbox_size_limit = 0
+recipient_delimiter = +
+
+# Virtual user table
+virtual_alias_domains =
+        postgresql.org.br
+virtual_alias_maps =
+        hash:/srv/postgresql.org.br/mail/virtual/virtual-postgresql.org.br
+
+
+biff = no
+
+append_dot_mydomain = no
+
+
+smtpd_helo_required = yes
+disable_vrfy_command = yes
+
+
+smtp_use_tls = yes
+
+
+smtpd_tls_loglevel = 1
+smtpd_tls_received_header = yes
+smtpd_tls_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
+smtpd_tls_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
+smtpd_use_tls = yes
+smtpd_tls_session_cache_database = btree:${queue_directory}/smtpd_scache
+smtp_tls_session_cache_database = btree:${queue_directory}/smtp_scache
+smtpd_tls_auth_only = yes
+
+tls_random_source = dev:/dev/urandom
+
+smtpd_delay_reject = yes
+smtpd_helo_required = yes
+smtpd_helo_restrictions =
+        permit_mynetworks,
+#       check_helo_access 
+#               hash:/srv/postfix/checks/access-helo,
+        reject_non_fqdn_hostname,
+        reject_invalid_hostname,
+        permit
+
+# Restrictions:SENDER
+smtpd_sender_restrictions =
+        check_sender_access hash:/srv/postgresql.org.br/mail/checks/check-sender-access,
+        permit_mynetworks,
+#       permit_sasl_authenticated,
+        reject_non_fqdn_sender,
+        reject_unknown_sender_domain,
+        permit
+
+# Restrictions:RECIPIENT
+smtpd_recipient_restrictions =
+        permit_mynetworks,
+        reject_unauth_pipelining,
+        reject_non_fqdn_recipient,
+        reject_unknown_recipient_domain,
+#       permit_sasl_authenticated,
+        reject_unauth_destination,
+        reject_unverified_recipient,
+        reject_rbl_client zen.spamhaus.org
+
+broken_sasl_auth_clients = yes
+
+mime_header_checks = regexp:/srv/postgresql.org.br/mail/checks/check-mime-headers
+
+
+readme_directory = /usr/share/doc/postfix
+html_directory = /usr/share/doc/postfix/html

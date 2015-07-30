@@ -1,0 +1,11 @@
+#!/bin/bash
+
+/etc/init.d/cron start &
+
+/etc/init.d/rsyslog start & 
+
+/etc/init.d/postfix start &
+
+/etc/init.d/mailman start & 
+
+/usr/sbin/apache2 -D FOREGROUND

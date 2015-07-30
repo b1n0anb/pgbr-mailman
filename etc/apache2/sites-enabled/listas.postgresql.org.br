@@ -1,0 +1,139 @@
+<VirtualHost *:80>
+	ServerAdmin admins@postgresql.org.br
+        ServerName listas.postgresql.org.br
+
+
+	Alias /pipermail/	/var/lib/mailman/archives/public/
+        Alias /images/mailman/  /usr/share/images/mailman/
+	Alias /arquivos-antigos /srv/listas.postgresql.org.br/www-listas-arquivos-antigos/
+        ScriptAlias /cgi-bin/mailman/ /usr/lib/cgi-bin/mailman/
+
+	<Directory /usr/lib/cgi-bin/mailman/>
+		AllowOverride None
+		Options ExecCGI -MultiViews +SymLinksIfOwnerMatch
+		AddHandler cgi-script .cgi
+		Order allow,deny
+		Allow from all
+	</Directory>
+
+	<Directory /var/lib/mailman/archives/public/>
+		Options FollowSymlinks
+		AllowOverride None
+		Order allow,deny
+		Allow from all
+	</Directory>
+<Directory /usr/share/images/mailman/>
+AllowOverride None
+Order allow,deny
+Allow from all
+</Directory>
+
+		
+	RewriteEngine On
+
+	# Reescreve da raiz pra listagem de listas
+	RewriteCond %{HTTP_HOST} ^listas\.postgresql\.org\.br
+	RewriteRule ^/$	https://listas.postgresql.org.br/cgi-bin/mailman/listinfo [R]
+        # Evita mensagem de notfound no pipermail
+        RewriteRule ^/pipermail/?$ https://listas.postgresql.org.br/cgi-bin/mailman/listinfo
+        # Arquivos antigos 
+        #RewriteRule ^/listinfo/desenvolvimento-postgresql	http://listas.postgresql.org.br/cgi-bin/mailman/listinfo/pgbr-desenvolvimento [R]
+	 
+#	RewriteCond %{HTTPS} !=on
+#	RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R,L]
+
+
+	<Directory />
+		Options FollowSymLinks
+		AllowOverride None
+	</Directory>
+	<Directory /srv/www/listas-arquivos-antigos/>
+                Options Indexes FollowSymLinks MultiViews
+                AllowOverride None
+		Order allow,deny
+		allow from all
+		IndexOptions NameWidth=60
+        </Directory>
+
+#	ErrorLog /srv/listas.postgresql.org.br/log/apache2/error.log
+
+	# Possible values include: debug, info, notice, warn, error, crit,
+	# alert, emerg.
+#	LogLevel warn
+
+#	CustomLog /srv/listas.postgresql.org.br/log/apache2/access.log combined
+	ServerSignature Off
+</VirtualHost>
+
+<IfModule mod_ssl.c>
+<VirtualHost *:443>
+        ServerAdmin admins@postgresql.org.br
+#       RedirectMatch ^(.*)$ https://pgbr.postgresql.org.br$1
+
+        SSLEngine on
+        SSLProtocol all
+#        SSLCertificateFile /srv/ssl/listas.postgresql.org.br.pem
+        SSLCertificateFile /srv/ssl/postgresql.org.br.crt
+
+
+        DocumentRoot /srv/listas.postgresql.org.br/www/
+
+	Alias /pipermail/	/var/lib/mailman/archives/public/
+        Alias /images/mailman/  /usr/share/images/mailman/
+	Alias /arquivos-antigos /srv/listas.postgresql.org.br/www-listas-arquivos-antigos/
+        ScriptAlias /cgi-bin/mailman/ /usr/lib/cgi-bin/mailman/
+
+	<Directory /usr/lib/cgi-bin/mailman/>
+		AllowOverride None
+		Options ExecCGI -MultiViews +SymLinksIfOwnerMatch
+		AddHandler cgi-script .cgi
+		Order allow,deny
+		Allow from all
+	</Directory>
+
+	<Directory /var/lib/mailman/archives/public/>
+		Options FollowSymlinks
+		AllowOverride None
+		Order allow,deny
+		Allow from all
+	</Directory>
+<Directory /usr/share/images/mailman/>
+AllowOverride None
+Order allow,deny
+Allow from all
+</Directory>
+
+		
+	#RewriteEngine On
+
+	# Reescreve da raiz pra listagem de listas
+	#RewriteRule ^/$	http://listas.postgresql.org.br/cgi-bin/mailman/listinfo [R]
+        # Evita mensagem de notfound no pipermail
+        #RewriteRule ^/pipermail/?$ http://listas.postgresql.org.br/cgi-bin/mailman/listinfo
+        # Arquivos antigos 
+        #RewriteRule ^/listinfo/desenvolvimento-postgresql	http://listas.postgresql.org.br/cgi-bin/mailman/listinfo/pgbr-desenvolvimento [R]
+	
+
+	<Directory />
+		Options FollowSymLinks
+		AllowOverride None
+	</Directory>
+	<Directory /srv/www/listas-arquivos-antigos/>
+                Options Indexes FollowSymLinks MultiViews
+                AllowOverride None
+		Order allow,deny
+		allow from all
+		IndexOptions NameWidth=60
+        </Directory>
+
+#	ErrorLog /srv/listas.postgresql.org.br/log/apache2/error.log
+
+	# Possible values include: debug, info, notice, warn, error, crit,
+	# alert, emerg.
+#	LogLevel warn
+
+#	CustomLog /srv/listas.postgresql.org.br/log/apache2/access.log combined
+	ServerSignature Off
+
+</VirtualHost>
+</IfModule>
