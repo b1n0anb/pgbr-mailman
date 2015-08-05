@@ -90,6 +90,11 @@ broken_sasl_auth_clients = yes
 
 mime_header_checks = regexp:/srv/postgresql.org.br/mail/checks/check-mime-headers
 
+milter_protocol = 2
+milter_default_action = accept
+smtpd_milters = unix:/opendkim/opendkim.sock
+non_smtpd_milters = unix:/opendkim/opendkim.sock
+
 
 readme_directory = /usr/share/doc/postfix
 html_directory = /usr/share/doc/postfix/html

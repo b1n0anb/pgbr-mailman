@@ -1,43 +1,57 @@
 #
 #
 #
-FROM debian:wheezy
+FROM debian:jessie
 
 MAINTAINER Fernando Ike fike@midstorm.org
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN echo "locales locales/locales_to_be_generated multiselect en_US.UTF-8 UTF-8" | debconf-set-selections &&\
-    echo "locales locales/default_environment_locale select en_US.UTF-8" | debconf-set-selections
+#RUN echo "locales locales/locales_to_be_generated multiselect en_US.UTF-8 UTF-8" | debconf-set-selections &&\
+#    echo "locales locales/default_environment_locale select en_US.UTF-8" | debconf-set-selections
 
-
-ENV LC_ALL en_US.UTF-8
-
-RUN apt-get update -qq && apt-get install locales apache2 rsyslog -y
+#ENV LC_ALL en_US.UTF-8
 
 COPY preseed.cfg preseed.cfg
 
-RUN debconf-set-selections preseed.cfg
-
-RUN a2enmod rewrite
-
 ADD etc /etc
-
-ADD mailman /var/lib/mailman
 
 ADD start /start
 
-RUN chown -R list: /var/lib/mailman/* && chmod +x /start
+RUN apt-get update -qq && \ 
+      apt-get install locales -y && \
+      apt-get -o Dpkg::Options::="--force-confold" \
+        --assume-yes --no-install-recommends install \ 
+        postfix \ 
+        apache2 \
+        rsyslog \ 
+        mailman \
+        opendkim \
+        opendkim-tools 
+      
+RUN debconf-set-selections preseed.cfg && \ 
+      a2enmod rewrite ssl cgid && \ 
+      a2dissite 000-default && \
+      adduser www-data list && \
+      mkdir -p /var/spool/postfix/opendkim && \
+      chown -R opendkim: /etc/opendkim /var/spool/postfix/opendkim && \
+      mkdir -p /srv/listas.postgresql.org.br/log/apache2/ && \
+      mkdir /srv/listas.postgresql.org.br/www && \
+      adduser postfix opendkim 
 
-RUN sed -i 's/exit\ 101/\#exit\ 101/g' /usr/sbin/policy-rc.d
+RUN chmod +x /start  
+      
+RUN rm preseed.cfg && \
+      apt-get clean && \ 
+      rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN apt-get install postfix apache2 mailman -y
+EXPOSE 25 8084 
 
-RUN sed -i 's/\#exit\ 101/\exit\ 101/g' /usr/sbin/policy-rc.d
+ENV APACHE_PID_FILE /var/run/apache2.pid
 
-RUN rm preseed.cfg
+ENV APACHE_LOCK_DIR /var/lock/apache2
 
-EXPOSE 8084 25 
+ENV APACHE_RUN_DIR /var/run/apache2
 
 ENV APACHE_RUN_USER www-data
 

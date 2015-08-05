@@ -1,0 +1,3 @@
+mail._domainkey.postgresql.org.br postgresql.org.br:mail20150728:/etc/opendkim/keys/postgresql.org.br/mail20150728.private
+mail._domainkey.postgresql.org.br listas.postgresql.org.br:mail20150728:/etc/opendkim/keys/postgresql.org.br/mail20150728.private
+mail._domainkey.postgresql.org.br olifante.postgresql.org.br:mail20150728:/etc/opendkim/keys/postgresql.org.br/mail20150728.private

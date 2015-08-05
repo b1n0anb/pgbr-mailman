@@ -1,11 +1,24 @@
 #!/bin/bash
 
-/etc/init.d/cron start &
+if [ -d /var/lib/mailman/bin ]
+ then 
+  echo -n
+ else
+  chown -R list: /var/lib/mailman
+  sed -i 's/\#exit\ 101/\exit\ 101/g' /usr/sbin/policy-rc.d
+fi
 
-/etc/init.d/rsyslog start & 
+while true
+do
+  if [ -n $(ps -U www-data --no-headers) ] 2> /dev/null
+   then
+       /etc/init.d/cron start 2>&1> /dev/null
+       /etc/init.d/rsyslog start 2>&1> /dev/null
+       /etc/init.d/postfix start 2>&1> /dev/null
+       /etc/init.d/mailman start 2>&1> /dev/null 
+       /etc/init.d/apache2 start 2>&1> /dev/null
+       /etc/init.d/opendkim start 2>&1> /dev/null
+   fi
+   sleep 3600
+done
 
-/etc/init.d/postfix start &
-
-/etc/init.d/mailman start & 
-
-/usr/sbin/apache2 -D FOREGROUND

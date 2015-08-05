@@ -103,3 +103,6 @@ DEFAULT_SEND_REMINDERS = 0
 
 # Note - if you're looking for something that is imported from mm_cfg, but you
 # didn't find it above, it's probably in /usr/lib/mailman/Mailman/Defaults.py.
+
+# Set to Unicode support
+add_language('en', 'English (USA)', 'utf-8', 'pt_BR')
